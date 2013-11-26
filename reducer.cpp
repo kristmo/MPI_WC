@@ -13,6 +13,7 @@
 #include <typeinfo>
 #include <sstream>
 #include <map>
+#include "words.pb.h"
 
 #include "mpi.h"
 
@@ -56,7 +57,10 @@ void reducer(MPI_Comm communicator, const string& filename){
     MPI_Offset  filesize;
     MPI_Status status;
     MPI_File_get_size(fh, &filesize);
-    
+    cout << "filesize : " << filesize << endl;
+    cout << "number of bytes to read per thread " << filesize/new_size << endl;
+    cout << "number of iterations per thread " << (filesize/new_size)/nodechucksize << endl;
+    WordList *ordalisti;
     int chunksize = nodechucksize * sizeof(char);
     loopoffset = new_size*nodechucksize;
     readoverlap = overlap * sizeof(char);
@@ -64,7 +68,7 @@ void reducer(MPI_Comm communicator, const string& filename){
     vector<std::string> lines;
     std::vector<std::string> words;
     std::map<string, int> teljari;
-    for (int i=0; i < 3; i++){
+    for (int i=0; i < (filesize/new_size)/nodechucksize; i++){
         MPI_File_set_view(fh,(new_rank*sizeof(char)*nodechucksize+(loopoffset*i)),MPI_CHAR,MPI_CHAR,"native",MPI_INFO_NULL);
         MPI_File_read(fh, &text_buffer[0], chunksize+readoverlap, MPI_CHAR, &status);
         printf("read processor rank %i read : ",new_rank);
@@ -86,7 +90,7 @@ void reducer(MPI_Comm communicator, const string& filename){
                     ss << stafur;
                 
                 if(!isalpha(stafur) && ss.str().length() > 0){
-                    cout << "ord : " << ss.str() << endl;
+                    //cout << "ord : " << ss.str() << endl;
                     string ord = ss.str();
                     auto it = teljari.find(ord);
                     if (it != teljari.end())
