@@ -28,14 +28,14 @@ extern void reducer(MPI_Comm communicator, const string& filename);
 const int MAX_MAPP_ID = 2;
 const int MAX_PART_ID = 4;
 int overlap = 20;
-int nodechucksize=200;
+int nodechucksize=262144;
 
 
 int main(int argc, char* argv[]) {
     MPI_Status status;
     int rank, size, color, errs=0;
-    double START;
-    string readfilename = "/home/maa33/code/mpi_wc/pg100.txt";
+    //double START;
+    string readfilename = "pg100.txt";
     
     MPI_Init(&argc, &argv);
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
     
     srand((unsigned)time(NULL) + rank*100);
     
-    START = MPI_Wtime();
+    //START = MPI_Wtime();
     
     // búum til com fyrir hópana
     MPI_Group mappers, partitioners, reducers, everyone;
