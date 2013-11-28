@@ -63,11 +63,15 @@ void mapper(MPI_Comm communicator, int rank, const string& filename){
     int chunksize = nodechucksize * sizeof(char);
     loopoffset = new_size*nodechucksize;
     readoverlap = overlap * sizeof(char);
+    
     vector<char> text_buffer(chunksize+overlap);
     vector<std::string> lines;
     std::vector<std::string> words;
     std::map<string, int> teljari;
     MPI_Offset mypart = filesize/new_size;
+    MPI_Offset = filesize - (new_size*mypart);
+    cout << "Filesize : " << filesize << " My part " << mypart << " Chunksize : " << nodechucksize << " number of loops : " << mypart/nodechucksize << " Remaining : " << remaining << endl;
+    
     for (int i=0; i <= mypart/chunksize; i++){
         MPI_File_set_view(fh,(new_rank*sizeof(char)*chunksize+(loopoffset*i)),MPI_CHAR,MPI_CHAR,"native",MPI_INFO_NULL);
         MPI_File_read(fh, &text_buffer[0], chunksize+readoverlap, MPI_CHAR, &status);
@@ -123,7 +127,7 @@ void mapper(MPI_Comm communicator, int rank, const string& filename){
         WordList output;
         for (auto it: teljari)
         {
-            cout << it.first << " : " << it.second << endl;
+            //cout << it.first << " : " << it.second << endl;
             Word* new_word = output.add_words();
             new_word->set_word(it.first);
             new_word->set_count(it.second);
