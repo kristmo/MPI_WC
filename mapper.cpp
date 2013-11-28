@@ -14,6 +14,7 @@
 #include <sstream>
 #include <map>
 
+#include <math.h>
 #include "mpi.h"
 #include "words.pb.h"
 
@@ -69,10 +70,17 @@ void mapper(MPI_Comm communicator, int rank, const string& filename){
     std::vector<std::string> words;
     std::map<string, int> teljari;
     MPI_Offset mypart = filesize/new_size;
-    MPI_Offset = filesize - (new_size*mypart);
-    cout << "Filesize : " << filesize << " My part " << mypart << " Chunksize : " << nodechucksize << " number of loops : " << mypart/nodechucksize << " Remaining : " << remaining << endl;
-    
-    for (int i=0; i <= mypart/chunksize; i++){
+    for (int i=0; i <= ceil(mypart/chunksize); i++){
+        cout << "rank : " << new_rank << " Trying to read from " << new_rank*sizeof(char)*chunksize+(loopoffset*i) << " to "  << new_rank*sizeof(char)*chunksize+(loopoffset*i)+chunksize+readoverlap << endl;
+        if(((new_rank*sizeof(char)*chunksize+(loopoffset*i)+chunksize+readoverlap) > filesize)){
+            chunksize = filesize - ((new_rank*sizeof(char)*chunksize+(loopoffset*i))-readoverlap);
+            cout << "rank : " << new_rank << " Trying to read from " << new_rank*sizeof(char)*chunksize+(loopoffset*i) << " to "  << new_rank*sizeof(char)*chunksize+(loopoffset*i)+chunksize+readoverlap << " file is noly " << filesize << " will only read " << chunksize << endl;
+            if (chunksize < 0){
+                cout << "Gone to far in file exiting" << endl;
+                break;
+            }
+        }
+           
         MPI_File_set_view(fh,(new_rank*sizeof(char)*chunksize+(loopoffset*i)),MPI_CHAR,MPI_CHAR,"native",MPI_INFO_NULL);
         MPI_File_read(fh, &text_buffer[0], chunksize+readoverlap, MPI_CHAR, &status);
         for( std::vector<char>::iterator i = text_buffer.begin(); i != text_buffer.end(); ++i){
@@ -124,7 +132,7 @@ void mapper(MPI_Comm communicator, int rank, const string& filename){
             }
         }
         // nú inniheldur teljari öll orð og tíðni þeirra...
-        WordList output;
+        /*WordList output;
         for (auto it: teljari)
         {
             //cout << it.first << " : " << it.second << endl;
@@ -134,9 +142,11 @@ void mapper(MPI_Comm communicator, int rank, const string& filename){
         }
         int size = output.ByteSize();
         char* buffer = new char[size];
-        output.SerializeToArray(buffer, size);
-        send_buffer_to_partitioner(new_rank, buffer, size);
+        output.SerializeToArray(buffer, size);*/
+        //send_buffer_to_partitioner(new_rank, buffer, size);
     }
+    cout << "ending " << new_rank << endl;
+    MPI_Barrier(communicator);
     MPI_File_close(&fh);
 } 
 
