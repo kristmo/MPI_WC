@@ -67,10 +67,10 @@ void mapper(MPI_Comm communicator, int rank, const string& filename){
     vector<std::string> lines;
     std::vector<std::string> words;
     std::map<string, int> teljari;
-    for (int i=0; i < 1; i++){
-        MPI_File_set_view(fh,(new_rank*sizeof(char)*nodechucksize+(loopoffset*i)),MPI_CHAR,MPI_CHAR,"native",MPI_INFO_NULL);
+    MPI_Offset mypart = filesize/new_size;
+    for (int i=0; i <= mypart/chunksize; i++){
+        MPI_File_set_view(fh,(new_rank*sizeof(char)*chunksize+(loopoffset*i)),MPI_CHAR,MPI_CHAR,"native",MPI_INFO_NULL);
         MPI_File_read(fh, &text_buffer[0], chunksize+readoverlap, MPI_CHAR, &status);
-        cout << "Rank " << new_rank << " read line '";
         for( std::vector<char>::iterator i = text_buffer.begin(); i != text_buffer.end(); ++i){
             if (isalpha(*i)){
                 continue;
