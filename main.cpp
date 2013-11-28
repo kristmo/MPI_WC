@@ -21,15 +21,18 @@ using std::time;
 using std::vector;
 using std::string;
 
-void mapper();
-void partitioner();
-extern void reducer(MPI_Comm communicator, const string& filename);
+extern void mapper(MPI_Comm communicator, int rank, const string& filename);
+extern void partitioner(MPI_Comm communicator, int rank);
+extern void reducer(MPI_Comm communicator, int rank;
 
 const int MAX_MAPP_ID = 2;
 const int MAX_PART_ID = 4;
 int overlap = 20;
 int nodechucksize=262144;
 
+vector<int> mapparar = {0, 1};
+vector<int> partarar = {2, 3};
+vector<int> reddarar = {4, 5};
 
 int main(int argc, char* argv[]) {
     MPI_Status status;
@@ -49,9 +52,6 @@ int main(int argc, char* argv[]) {
     MPI_Group mappers, partitioners, reducers, everyone;
     MPI_Comm mapparacom, partararcomm, reddararcomm;
 
-    vector<int> mapparar = {0, 1};
-    vector<int> partarar = {2, 3};
-    vector<int> reddarar = {4, 5};
     
     MPI_Comm_group(MPI_COMM_WORLD, &everyone);
 
@@ -70,13 +70,15 @@ int main(int argc, char* argv[]) {
     
     if (rank < MAX_MAPP_ID)
     {
-        reducer(mapparacom,readfilename);
+        mapper(reddararcomm, rank, readfilename);
     }
     else if (rank < MAX_PART_ID)
     {
+        reducer(mapparacom, rank);
     }
     else
     {
+        partitioner(partararcomm, rank);
     }
     
     cout << "Node " << rank << " stopping." << endl;
