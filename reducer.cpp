@@ -68,10 +68,10 @@ void reducer(MPI_Comm communicator, const string& filename){
     vector<std::string> lines;
     std::vector<std::string> words;
     std::map<string, int> teljari;
-    for (int i=0; i < (filesize/new_size)/nodechucksize; i++){
+    /*for (int i=0; i < (filesize/new_size)/nodechucksize; i++){*/
+    for (int i=0; i < 1; i++){
         MPI_File_set_view(fh,(new_rank*sizeof(char)*nodechucksize+(loopoffset*i)),MPI_CHAR,MPI_CHAR,"native",MPI_INFO_NULL);
         MPI_File_read(fh, &text_buffer[0], chunksize+readoverlap, MPI_CHAR, &status);
-        printf("read processor rank %i read : ",new_rank);
         std::string text_string_buffer(text_buffer.begin(), text_buffer.end());
         split(text_string_buffer, '\n', lines);
         for(string &line: lines){
