@@ -132,17 +132,17 @@ void mapper(MPI_Comm communicator, int rank, const string& filename){
             }
         }
         // nú inniheldur teljari öll orð og tíðni þeirra...
-        /*WordList output;
+        WordList output;
         for (auto it: teljari)
         {
-            //cout << it.first << " : " << it.second << endl;
+            cout << it.first << " : " << it.second << endl;
             Word* new_word = output.add_words();
             new_word->set_word(it.first);
             new_word->set_count(it.second);
         }
         int size = output.ByteSize();
         char* buffer = new char[size];
-        output.SerializeToArray(buffer, size);*/
+        output.SerializeToArray(buffer, size);
         //send_buffer_to_partitioner(new_rank, buffer, size);
     }
     cout << "ending " << new_rank << endl;
